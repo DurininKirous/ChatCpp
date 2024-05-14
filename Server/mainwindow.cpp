@@ -4,6 +4,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    connect(&server,&Server::SendMessageToWindow,this,&MainWindow::DisplayMessage);
     ui->setupUi(this);
 }
 
@@ -29,4 +30,7 @@ void MainWindow::on_pushButton_clicked()
         ui->pushButton->setText("Start server");
     }
 }
-
+void MainWindow::DisplayMessage(QString message)
+{
+    ui->textBrowser->append(message);
+}

@@ -60,6 +60,7 @@ void Server::slotReadyRead()
             QString str;
             in >> str;
             nextBlockSize=0;
+            emit SendMessageToWindow(str);
             SendToClient(str);
             break;
         }
