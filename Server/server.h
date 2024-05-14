@@ -25,6 +25,8 @@ public slots:
     void slotReadyRead();
     void slotDeleteUser();
 signals:
-    void SendMessageToWindow(QString message);
+    void SendMessageToChat(QString message);
+    void SendGoodMessageToLogs(QString message);
+    void SendBadMessageToLogs(QString message);
 };
 #endif // SERVER_H
