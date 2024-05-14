@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
-    <height>470</height>
+    <width>500</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,28 +15,26 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="3">
-     <widget class="QSpinBox" name="spinBox">
-      <property name="maximum">
-       <number>65535</number>
+    <item row="12" column="0" colspan="5">
+     <widget class="QPushButton" name="pushButton">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
       </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Address</string>
+       <string>Start server</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>25</width>
+        <height>25</height>
+       </size>
       </property>
      </widget>
     </item>
-    <item row="3" column="2">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Port</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
+    <item row="13" column="4">
      <widget class="QComboBox" name="comboBox">
       <item>
        <property name="text">
@@ -50,24 +48,31 @@
       </item>
      </widget>
     </item>
-    <item row="2" column="0" colspan="4">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Start server</string>
+    <item row="13" column="1">
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+    <item row="13" column="3">
+     <widget class="QSpinBox" name="spinBox">
+      <property name="maximum">
+       <number>65535</number>
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="lineEdit"/>
+    <item row="20" column="0" colspan="5">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>Send</string>
+      </property>
+     </widget>
     </item>
-    <item row="1" column="0" colspan="4">
+    <item row="18" column="0" colspan="5">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
+        <item row="1" column="0">
          <widget class="QTextBrowser" name="textBrowser">
           <property name="html">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -97,19 +102,36 @@ p, li { white-space: pre-wrap; }
       </widget>
      </widget>
     </item>
+    <item row="13" column="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Port</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Address</string>
+      </property>
+     </widget>
+    </item>
+    <item row="19" column="0" colspan="5">
+     <widget class="QLineEdit" name="lineEdit_2"/>
+    </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>495</width>
+     <width>500</width>
      <height>33</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

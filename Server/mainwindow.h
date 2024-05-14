@@ -27,6 +27,10 @@ private slots:
     void DisplayBadLog(QString message);
     //void on_comboBox_activated(const QString &arg1);
 
+    void on_pushButton_2_clicked();
+
+    void on_lineEdit_2_returnPressed();
+
 private:
     Ui::MainWindow *ui;
 };

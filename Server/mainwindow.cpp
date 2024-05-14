@@ -72,3 +72,35 @@ void MainWindow::ChangeScreen()
     }
 }
 
+void MainWindow::on_pushButton_2_clicked()
+{
+    server.SendToClient(ui->lineEdit_2->text());
+    if (server.isListening())
+    {
+        ui->textBrowser->append(ui->lineEdit_2->text());
+    }
+    else
+    {
+        ui->textBrowser_2->setTextColor(QColor(Qt::red));
+        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent");
+        ui->textBrowser_2->setTextColor(QColor(Qt::black));
+    }
+    ui->lineEdit_2->clear();
+}
+
+void MainWindow::on_lineEdit_2_returnPressed()
+{
+    server.SendToClient(ui->lineEdit_2->text());
+    if (server.isListening())
+    {
+        ui->textBrowser->append(ui->lineEdit_2->text());
+    }
+    else
+    {
+        ui->textBrowser_2->setTextColor(QColor(Qt::red));
+        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent");
+        ui->textBrowser_2->setTextColor(QColor(Qt::black));
+    }
+    ui->lineEdit_2->clear();
+}
+
