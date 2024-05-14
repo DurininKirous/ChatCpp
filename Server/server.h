@@ -5,7 +5,7 @@
 #include <QTcpServer>
 #include <QVector>
 
-class Server: QTcpServer
+class Server: public QTcpServer
 {
     Q_OBJECT
 public:
@@ -24,5 +24,7 @@ public slots:
     void incomingConnection(qintptr socketDescriptor);
     void slotReadyRead();
     void slotDeleteUser();
+signals:
+    void SendMessageToWindow(QString message);
 };
 #endif // SERVER_H

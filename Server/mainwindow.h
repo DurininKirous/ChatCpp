@@ -21,7 +21,7 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
+    void DisplayMessage(QString message);
 private:
     Ui::MainWindow *ui;
 };
