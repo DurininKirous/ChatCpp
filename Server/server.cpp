@@ -4,12 +4,12 @@ void Server::StartServer(QHostAddress Addr, quint16 Port)
 {
     if (this->listen(Addr,Port))
     {
-        qDebug()<<"start";
+        emit SendGoodMessageToLogs("System: The server started");
         Check=true;
     }
     else
     {
-        qDebug()<<"error";
+        emit SendBadMessageToLogs("System: Error, the server did not start working");
     }
 }
 
@@ -17,7 +17,7 @@ void Server::StopServer()
 {
     this->close();
     Check=false;
-    qDebug()<<"Server is closed...";
+    emit SendGoodMessageToLogs("System: Server is closed...");
 }
 void Server::incomingConnection(qintptr socketDescriptor)
 {
@@ -27,7 +27,8 @@ void Server::incomingConnection(qintptr socketDescriptor)
     connect(socket, SIGNAL(disconnected()), this, SLOT(slotDeleteUser()));
 
     Sockets.push_back(socket);
-    qDebug() <<"Client connected" << socketDescriptor;
+    QString message="System: Client connected "+QString::number(socketDescriptor);
+    emit SendGoodMessageToLogs(message);
 }
 void Server::slotReadyRead()
 {
@@ -36,7 +37,7 @@ void Server::slotReadyRead()
     in.setVersion(QDataStream::Qt_6_2);
     if (in.status() == QDataStream::Ok)
     {
-        qDebug()<<"read...";
+        emit SendGoodMessageToLogs("System: Reading messages...");
         /*QString str;
         in >> str;
         qDebug()<<str;
@@ -47,27 +48,27 @@ void Server::slotReadyRead()
             {
                 if (socket->bytesAvailable()<2)
                 {
-                    qDebug()<<"Data < 2, break";
+                    emit SendBadMessageToLogs("System: Data < 2, break");
                     break;
                 }
                 in >> nextBlockSize;
             }
             if (socket->bytesAvailable() < nextBlockSize)
             {
-                qDebug()<<"Data not full, break";
+                emit SendBadMessageToLogs("System: Data not full, break");
                 break;
             }
             QString str;
             in >> str;
             nextBlockSize=0;
-            emit SendMessageToWindow(str);
+            emit SendMessageToChat(str);
             SendToClient(str);
             break;
         }
     }
     else
     {
-        qDebug()<<"QDataStream error";
+        emit SendBadMessageToLogs("System: QDataStream error");
     }
 }
 void Server::slotDeleteUser()
@@ -77,7 +78,7 @@ void Server::slotDeleteUser()
     {
         Sockets.erase(std::remove(Sockets.begin(), Sockets.end(), disconnectedSocket), Sockets.end());
         disconnectedSocket->deleteLater();
-        qDebug() << "Client disconnected";
+        emit SendBadMessageToLogs("System: Client disconnected");
     }
 }
 void Server::SendToClient(QString str)

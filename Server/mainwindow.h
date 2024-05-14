@@ -18,10 +18,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     Server server;
-
+public slots:
+    void ChangeScreen();
 private slots:
     void on_pushButton_clicked();
     void DisplayMessage(QString message);
+    void DisplayGoodLog(QString message);
+    void DisplayBadLog(QString message);
+    //void on_comboBox_activated(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
 };
