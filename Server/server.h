@@ -12,12 +12,12 @@ public:
     Server();
     void StartServer(QHostAddress Addr, quint16 Port);
     void StopServer();
+    void SendToClient(QString str);
     QTcpSocket* socket;
     bool Check=false;
 private:
     QVector<QTcpSocket*> Sockets;
     QByteArray Data;
-    void SendToClient(QString str);
     quint16 nextBlockSize=0;
 
 public slots:
