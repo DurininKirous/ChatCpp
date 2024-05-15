@@ -4,7 +4,7 @@
 #include <QTcpSocket>
 #include <QTcpServer>
 #include <QVector>
-
+#include <client.h>
 class Server: public QTcpServer
 {
     Q_OBJECT
@@ -13,10 +13,10 @@ public:
     void StartServer(QHostAddress Addr, quint16 Port);
     void StopServer();
     void SendToClient(QString str);
-    QTcpSocket* socket;
+    Client User;
     bool Check=false;
 private:
-    QVector<QTcpSocket*> Sockets;
+    QVector<Client*> Users;
     QByteArray Data;
     quint16 nextBlockSize=0;
 

@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QTcpSocket>
-
+#include <client.h>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -27,13 +27,13 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QTcpSocket* socket;
+    Client User;
     QByteArray Data;
     void SendToServer(QString str);
     quint16 nextBlockSize=0;
-
 public slots:
     void  slotReadyRead();
+    void  slotSendName();
     //void slotDeleteUser();
 };
 #endif // MAINWINDOW_H

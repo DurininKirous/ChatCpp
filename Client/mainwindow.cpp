@@ -6,9 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    socket = new QTcpSocket(this);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    User.socket = new QTcpSocket(this);
+    connect(User.socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    connect(User.socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    connect(User.socket, SIGNAL(connected()), this, SLOT(slotSendName()));
 }
 
 MainWindow::~MainWindow()
@@ -21,11 +22,12 @@ void MainWindow::on_pushButton_2_clicked()
     QString Addr=ui->lineEdit_2->text();
     bool ok;
     quint16 Port=(ui->spinBox->text()).toInt(&ok);
-    socket->connectToHost(Addr,Port);
+    User.SetName(ui->lineEdit_3->text());
+    User.socket->connectToHost(Addr,Port);
 }
 void MainWindow::slotReadyRead()
 {
-    QDataStream in(socket);
+    QDataStream in(User.socket);
     in.setVersion(QDataStream::Qt_6_2);
     if (in.status() == QDataStream::Ok)
     {
@@ -36,13 +38,13 @@ void MainWindow::slotReadyRead()
         {
             if (nextBlockSize==0)
             {
-                if (socket->bytesAvailable()<2)
+                if (User.socket->bytesAvailable()<2)
                 {
                     break;
                 }
                 in >> nextBlockSize;
             }
-            if (socket->bytesAvailable() < nextBlockSize)
+            if (User.socket->bytesAvailable() < nextBlockSize)
             {
                 break;
             }
@@ -70,7 +72,7 @@ void MainWindow::SendToServer(QString str)
     out << quint16(0) << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
-    socket -> write(Data);
+    User.socket -> write(Data);
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -84,5 +86,10 @@ void MainWindow::on_lineEdit_returnPressed()
 {
     SendToServer(ui->lineEdit->text());
     ui->lineEdit->clear();
+}
+void MainWindow::slotSendName()
+{
+    QString name="Name:"+User.GetName();
+    SendToServer(name);
 }
 
