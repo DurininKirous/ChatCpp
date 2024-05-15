@@ -21,19 +21,20 @@ void Server::StopServer()
 }
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    socket = new QTcpSocket;
-    socket->setSocketDescriptor(socketDescriptor);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(slotDeleteUser()));
+    Client* newUser = new Client; // Создание нового экземпляра класса Client
+    newUser->socket = new QTcpSocket; // Создание нового экземпляра класса QTcpSocket
+    newUser->socket->setSocketDescriptor(socketDescriptor);
+    connect(newUser->socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    connect(newUser->socket, SIGNAL(disconnected()), this, SLOT(slotDeleteUser()));
 
-    Sockets.push_back(socket);
-    QString message="System: Client connected "+QString::number(socketDescriptor);
+    Users.push_back(newUser);
+    QString message = "System: Client connected " + QString::number(socketDescriptor);
     emit SendGoodMessageToLogs(message);
 }
 void Server::slotReadyRead()
 {
-    socket = (QTcpSocket*)sender();
-    QDataStream in(socket);
+    User.socket = (QTcpSocket*)sender();
+    QDataStream in(User.socket);
     in.setVersion(QDataStream::Qt_6_2);
     if (in.status() == QDataStream::Ok)
     {
@@ -46,21 +47,42 @@ void Server::slotReadyRead()
         {
             if (nextBlockSize==0)
             {
-                if (socket->bytesAvailable()<2)
+                if (User.socket->bytesAvailable()<2)
                 {
                     emit SendBadMessageToLogs("System: Data < 2, break");
                     break;
                 }
                 in >> nextBlockSize;
             }
-            if (socket->bytesAvailable() < nextBlockSize)
+            if (User.socket->bytesAvailable() < nextBlockSize)
             {
                 emit SendBadMessageToLogs("System: Data not full, break");
                 break;
             }
             QString str;
+            QString name;
+            bool NameChanged=false;
             in >> str;
             nextBlockSize=0;
+            for (auto it = Users.begin(); it != Users.end(); ++it)
+            {
+                if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
+                {
+                    if (str.contains("Name:"))
+                    {
+                        str.remove(0,5);
+                        (*it)->SetName(str);
+                        NameChanged=true;
+                        break;
+                    }
+                    name=(*it)->GetName();
+                }
+            }
+            if (NameChanged)
+            {
+                break;
+            }
+            str=name+": "+str;
             emit SendMessageToChat(str);
             SendToClient(str);
             break;
@@ -74,11 +96,16 @@ void Server::slotReadyRead()
 void Server::slotDeleteUser()
 {
     QTcpSocket* disconnectedSocket = qobject_cast<QTcpSocket*>(sender());
-    if (disconnectedSocket)
+    for (auto it = Users.begin(); it != Users.end(); ++it)
     {
-        Sockets.erase(std::remove(Sockets.begin(), Sockets.end(), disconnectedSocket), Sockets.end());
-        disconnectedSocket->deleteLater();
-        emit SendBadMessageToLogs("System: Client disconnected");
+        if ((*it)->socket == disconnectedSocket)
+        {
+            emit SendBadMessageToLogs("System: Client disconnected");
+            (*it)->socket->deleteLater();
+            delete (*it);
+            Users.erase(it);
+            break;
+        }
     }
 }
 void Server::SendToClient(QString str)
@@ -90,8 +117,8 @@ void Server::SendToClient(QString str)
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     //socket -> write(Data);
-    for(int i=0;i<Sockets.size();++i)
+    for(int i=0;i<Users.size();++i)
     {
-        Sockets[i]->write(Data);
+        (*Users[i]).socket->write(Data);
     }
 }
