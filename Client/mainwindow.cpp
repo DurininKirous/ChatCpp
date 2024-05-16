@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     User.socket = new QTcpSocket(this);
     connect(User.socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-    connect(User.socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    connect(User.socket, SIGNAL(disconnected()), this, SLOT(CloseSocket()));
     connect(User.socket, SIGNAL(connected()), this, SLOT(slotSendName()));
 }
 
@@ -19,11 +19,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    QString Addr=ui->lineEdit_2->text();
-    bool ok;
-    quint16 Port=(ui->spinBox->text()).toInt(&ok);
-    User.SetName(ui->lineEdit_3->text());
-    User.socket->connectToHost(Addr,Port);
+    if (User.Check == false)
+    {
+        QString Addr=ui->lineEdit_2->text();
+        bool ok;
+        quint16 Port=(ui->spinBox->text()).toInt(&ok);
+        User.SetName(ui->lineEdit_3->text());
+        User.socket->connectToHost(Addr,Port);
+        if (User.socket->state() == QAbstractSocket::ConnectedState || User.socket->state() == QAbstractSocket::ConnectingState)
+        {
+            User.Check = true;
+            ui->pushButton_2->setText("Disconnect");
+        }
+    }
+    else
+    {
+        User.socket->disconnectFromHost();
+        ui->pushButton_2->setText("Connect");
+        User.Check=false;
+    }
 }
 void MainWindow::slotReadyRead()
 {
@@ -48,10 +62,21 @@ void MainWindow::slotReadyRead()
             {
                 break;
             }
-            QString str;
-            in >> str;
-            nextBlockSize=0;
-            ui->textBrowser->append(str);
+            quint16 command;
+            in >> command;
+            switch (command)
+            {
+                case (1):
+                {
+                    QString str;
+                    in >> str;
+                    nextBlockSize=0;
+                    ui->textBrowser->append(str);
+                    break;
+                }
+                default:
+                    break;
+            }
         }
     }
     else
@@ -92,4 +117,8 @@ void MainWindow::slotSendName()
     QString name="Name:"+User.GetName();
     SendToServer(name);
 }
-
+void MainWindow::CloseSocket()
+{
+    while (User.socket->state() != QAbstractSocket::UnconnectedState)
+    User.socket->deleteLater();
+}

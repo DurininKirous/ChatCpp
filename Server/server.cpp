@@ -15,21 +15,30 @@ void Server::StartServer(QHostAddress Addr, quint16 Port)
 
 void Server::StopServer()
 {
+    for (int i=0;i<Users.size();++i)
+    {
+        Users[i]->socket->disconnectFromHost();
+        //Users[i]->socket->deleteLater();
+        //Users[i]->socket->close();
+    }
+    Users.clear();
     this->close();
     Check=false;
     emit SendGoodMessageToLogs("System: Server is closed...");
 }
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    Client* newUser = new Client; // Создание нового экземпляра класса Client
-    newUser->socket = new QTcpSocket; // Создание нового экземпляра класса QTcpSocket
+    Client* newUser = new Client;
+    newUser->socket = new QTcpSocket;
     newUser->socket->setSocketDescriptor(socketDescriptor);
     connect(newUser->socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
     connect(newUser->socket, SIGNAL(disconnected()), this, SLOT(slotDeleteUser()));
+    //connect(newUser->socket, SIGNAL(SocketDisconnected()), this, SLOT(UserDisconnected()));
 
     Users.push_back(newUser);
     QString message = "System: Client connected " + QString::number(socketDescriptor);
     emit SendGoodMessageToLogs(message);
+    qDebug() <<Users.size();
 }
 void Server::slotReadyRead()
 {
@@ -73,7 +82,6 @@ void Server::slotReadyRead()
                         str.remove(0,5);
                         (*it)->SetName(str);
                         NameChanged=true;
-                        break;
                     }
                     name=(*it)->GetName();
                 }
@@ -84,7 +92,7 @@ void Server::slotReadyRead()
             }
             str=name+": "+str;
             emit SendMessageToChat(str);
-            SendToClient(str);
+            SendMessageToClient(str);
             break;
         }
     }
@@ -108,12 +116,12 @@ void Server::slotDeleteUser()
         }
     }
 }
-void Server::SendToClient(QString str)
+void Server::SendMessageToClient(QString str)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;
+    out << quint16(0) << commSendMessageToEveryone << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     //socket -> write(Data);
@@ -122,3 +130,31 @@ void Server::SendToClient(QString str)
         (*Users[i]).socket->write(Data);
     }
 }
+void Server::SendFileToClient(QString FilePath)
+{
+    QFile file(FilePath);
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QDataStream out(&Data, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_2);
+        out << quint16(0) << file.readAll();
+        out.device()->seek(0);
+        out << quint16(Data.size() - sizeof(quint16));
+    }
+}
+bool Server::isNameValid(QString name) const
+{
+    if (name.length() > 20 || name.length() < 5)
+        return false;
+    QRegularExpression r("[A-Za-z0-9_]+");
+    return (r.match(name)).hasMatch();
+}
+
+bool Server::isntNameUsed(QString name) const
+{
+    for (int i = 0; i < Users.length(); ++i)
+        if (Users.at(i)->GetName() == name)
+            return false;
+    return true;
+}
+

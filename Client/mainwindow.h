@@ -34,6 +34,6 @@ private:
 public slots:
     void  slotReadyRead();
     void  slotSendName();
-    //void slotDeleteUser();
+    void CloseSocket();
 };
 #endif // MAINWINDOW_H
