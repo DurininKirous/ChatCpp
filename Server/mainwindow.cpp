@@ -25,12 +25,15 @@ void MainWindow::on_pushButton_clicked()
 {
     if (server.Check==false)
     {
-    QHostAddress Addr;
-    Addr.setAddress(ui->lineEdit->text());
-    bool ok;
-    quint16 Port=(ui->spinBox->text()).toInt(&ok);
-    server.StartServer(Addr, Port);
-    ui->pushButton->setText("Stop server");
+        QHostAddress Addr;
+        Addr.setAddress(ui->lineEdit->text());
+        bool ok;
+        quint16 Port=(ui->spinBox->text()).toInt(&ok);
+        server.StartServer(Addr, Port);
+        if (server.Check == true )
+        {
+            ui->pushButton->setText("Stop server");
+        }
     }
     else
     {
@@ -74,7 +77,7 @@ void MainWindow::ChangeScreen()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    server.SendToClient(ui->lineEdit_2->text());
+    server.SendMessageToClient(ui->lineEdit_2->text());
     if (server.isListening())
     {
         ui->textBrowser->append(ui->lineEdit_2->text());
@@ -90,7 +93,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_lineEdit_2_returnPressed()
 {
-    server.SendToClient(ui->lineEdit_2->text());
+    server.SendMessageToClient(ui->lineEdit_2->text());
     if (server.isListening())
     {
         ui->textBrowser->append(ui->lineEdit_2->text());

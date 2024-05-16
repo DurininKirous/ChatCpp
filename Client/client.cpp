@@ -1,8 +1,6 @@
 #include <client.h>
-Client::~Client()
-{
-    socket->deleteLater();
-}
+Client::Client() {}
+Client::~Client() {}
 void Client::SetName(QString name)
 {
     Name = name;
@@ -10,4 +8,14 @@ void Client::SetName(QString name)
 QString Client::GetName()
 {
     return Name;
+}
+void Client::NameIsUsed()
+{
+    emit BoxNameIsUsed();
+    socket->close();
+}
+void Client::NameIsntValid()
+{
+    emit BoxNameIsntValid();
+    socket->close();
 }
