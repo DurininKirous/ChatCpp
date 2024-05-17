@@ -12,14 +12,17 @@ class Server: public QTcpServer
     Q_OBJECT
 public:
     static const quint16 commSendMessageToEveryone=1;
+    static const quint16 commSendUserName=2;
+    static const quint16 commSendMessageToSpecificClient=3;
 public:
     Server();
     void StartServer(QHostAddress Addr, quint16 Port);
     void StopServer();
-    void SendMessageToClient(QString str);
+    void SendMessageToClient(QString str, quint16 comm);
+    void SendMessageToSpecificClient(Client* user, QString str);
     void SendFileToClient(QString FilePath);
     bool isNameValid(QString name) const;
-    bool isntNameUsed(QString name) const;
+    bool isNameUsed(QString name) const;
     Client User;
     bool Check=false;
 private:
@@ -35,6 +38,7 @@ signals:
     void SendMessageToChat(QString message);
     void SendGoodMessageToLogs(QString message);
     void SendBadMessageToLogs(QString message);
+    void SendMessageToMessageBox(QString message);
     void NameIsUsed();
     void NameIsntValid();
 };

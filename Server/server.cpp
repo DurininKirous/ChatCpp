@@ -9,7 +9,7 @@ void Server::StartServer(QHostAddress Addr, quint16 Port)
     }
     else
     {
-        emit SendBadMessageToLogs("System: Error, the server did not start working");
+        emit SendMessageToMessageBox("System: Error, the server did not start working. Possibly the port or address is unavailable.");
     }
 }
 
@@ -70,29 +70,44 @@ void Server::slotReadyRead()
             }
             QString str;
             QString name;
-            bool NameChanged=false;
+            quint16 comm;
+            in >> comm;
             in >> str;
             nextBlockSize=0;
-            for (auto it = Users.begin(); it != Users.end(); ++it)
+            switch (comm)
             {
-                if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
+            case 1:
+                for (auto it = Users.begin(); it != Users.end(); ++it)
                 {
-                    if (str.contains("Name:"))
+                    if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
                     {
-                        str.remove(0,5);
-                        (*it)->SetName(str);
-                        NameChanged=true;
+                        name=(*it)->GetName();
                     }
-                    name=(*it)->GetName();
+                }
+                str=name+": "+str;
+                emit SendMessageToChat(str);
+                SendMessageToClient(str, this->commSendMessageToEveryone);
+                break;
+            case 2:
+                for (auto it = Users.begin(); it != Users.end(); ++it)
+                {
+                    if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
+                    {
+                        if (!(this->isNameValid(str)))
+                        {
+                            SendMessageToSpecificClient((*it),"System: The name isn't valid. Please change it, you're disconnected");
+                            //break;
+                        }
+                        else if (!(this->isNameUsed(str)))
+                        {
+                            SendMessageToSpecificClient((*it),"System: The name is already used. Please change it, you're disconnected");
+                            //break;
+                        }
+                        else (*it)->SetName(str);
+                        break;
+                    }
                 }
             }
-            if (NameChanged)
-            {
-                break;
-            }
-            str=name+": "+str;
-            emit SendMessageToChat(str);
-            SendMessageToClient(str);
             break;
         }
     }
@@ -116,18 +131,36 @@ void Server::slotDeleteUser()
         }
     }
 }
-void Server::SendMessageToClient(QString str)
+void Server::SendMessageToClient(QString str, quint16 comm)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << commSendMessageToEveryone << str;
+    out << quint16(0) << comm << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     //socket -> write(Data);
     for(int i=0;i<Users.size();++i)
     {
         (*Users[i]).socket->write(Data);
+    }
+}
+void Server::SendMessageToSpecificClient(Client* user, QString str)
+{
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << commSendMessageToSpecificClient << str;
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    //socket -> write(Data);
+    for(int i=0;i<Users.size();++i)
+    {
+        if ((*user).socket == (*Users[i]).socket)
+        {
+            (*Users[i]).socket->write(Data);
+            break;
+        }
     }
 }
 void Server::SendFileToClient(QString FilePath)
@@ -144,13 +177,11 @@ void Server::SendFileToClient(QString FilePath)
 }
 bool Server::isNameValid(QString name) const
 {
-    if (name.length() > 20 || name.length() < 5)
-        return false;
-    QRegularExpression r("[A-Za-z0-9_]+");
+    QRegularExpression r("^[A-Za-z0-9_]+$");
     return (r.match(name)).hasMatch();
 }
 
-bool Server::isntNameUsed(QString name) const
+bool Server::isNameUsed(QString name) const
 {
     for (int i = 0; i < Users.length(); ++i)
         if (Users.at(i)->GetName() == name)

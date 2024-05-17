@@ -7,7 +7,12 @@ class Client : public QObject
     Q_OBJECT
     QString Name="Unknown";
 public:
-    QTcpSocket*  socket;
+    static const quint16 commSendMessageToEveryone=1;
+    static const quint16 commSendUserName=2;
+    static const quint16 commSendMessageToSpecificClient=3;
+public:
+    QTcpSocket* socket;
+    bool Check=false;
     Client();
     ~Client();
     Client(const Client&) {}
@@ -17,6 +22,7 @@ public:
 public slots:
     void NameIsUsed();
     void NameIsntValid();
+    //void ReadFile();
 signals:
     void BoxNameIsUsed();
     void BoxNameIsntValid();

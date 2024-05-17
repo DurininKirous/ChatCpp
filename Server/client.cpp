@@ -1,9 +1,6 @@
 #include <client.h>
 Client::Client() {}
-Client::~Client()
-{
-    socket->deleteLater();
-}
+Client::~Client() {}
 void Client::SetName(QString name)
 {
     Name = name;
