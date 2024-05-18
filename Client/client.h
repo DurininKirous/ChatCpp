@@ -8,6 +8,8 @@ class Client : public QObject
     QString Name="Unknown";
 public:
     static const quint16 commSendMessageToEveryone=1;
+    static const quint16 commSendUserName=2;
+    static const quint16 commSendMessageToSpecificClient=3;
 public:
     QTcpSocket* socket;
     bool Check=false;

@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&server,&Server::SendMessageToChat,this,&MainWindow::DisplayMessage);
     connect(&server,&Server::SendGoodMessageToLogs,this,&MainWindow::DisplayGoodLog);
     connect(&server,&Server::SendBadMessageToLogs,this,&MainWindow::DisplayBadLog);
+    connect(&server, &Server::SendMessageToMessageBox,this,&MainWindow::DisplayErrorMessageBox);
     ui->setupUi(this);
     connect(ui->comboBox,&QComboBox::currentIndexChanged,this,&MainWindow::ChangeScreen);
     ui->stackedWidget->addWidget(ui->textBrowser);
@@ -77,7 +78,7 @@ void MainWindow::ChangeScreen()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    server.SendMessageToClient(ui->lineEdit_2->text());
+    server.SendMessageToClient(ui->lineEdit_2->text(),server.commSendMessageToEveryone);
     if (server.isListening())
     {
         ui->textBrowser->append(ui->lineEdit_2->text());
@@ -93,7 +94,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_lineEdit_2_returnPressed()
 {
-    server.SendMessageToClient(ui->lineEdit_2->text());
+    server.SendMessageToClient(ui->lineEdit_2->text(), server.commSendMessageToEveryone);
     if (server.isListening())
     {
         ui->textBrowser->append(ui->lineEdit_2->text());
@@ -106,4 +107,7 @@ void MainWindow::on_lineEdit_2_returnPressed()
     }
     ui->lineEdit_2->clear();
 }
-
+void MainWindow::DisplayErrorMessageBox(QString str)
+{
+    QMessageBox::information(this, "Error", str);
+}

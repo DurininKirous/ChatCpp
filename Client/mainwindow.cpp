@@ -54,6 +54,7 @@ void MainWindow::slotReadyRead()
             {
                 if (User.socket->bytesAvailable()<2)
                 {
+                    qDebug() << "Data < 2, break\n";
                     break;
                 }
                 in >> nextBlockSize;
@@ -74,9 +75,21 @@ void MainWindow::slotReadyRead()
                     ui->textBrowser->append(str);
                     break;
                 }
+            case 3:
+            {
+                QString str;
+                in >> str;
+                nextBlockSize=0;
+                QMessageBox::information(this, "Error", str);
+                User.Check=false;
+                ui->pushButton_2->setText("Connect");
+                User.socket->disconnectFromHost();
+                break;
+            }
                 default:
                     break;
             }
+            break;
         }
     }
     else
@@ -89,12 +102,12 @@ void MainWindow::slotReadyRead()
     Sockets.erase(std::remove_if(Socket.begin(), Socket.end(), socket), Socket.end());
     Socket->deleteLater();
 }*/
-void MainWindow::SendToServer(QString str)
+void MainWindow::SendToServer(QString str, quint16 comm)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << str;
+    out << quint16(0) << comm <<str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     User.socket -> write(Data);
@@ -102,20 +115,20 @@ void MainWindow::SendToServer(QString str)
 
 void MainWindow::on_pushButton_clicked()
 {
-    SendToServer(ui->lineEdit->text());
+    SendToServer(ui->lineEdit->text(), User.commSendMessageToEveryone);
     ui->lineEdit->clear();
 }
 
 
 void MainWindow::on_lineEdit_returnPressed()
 {
-    SendToServer(ui->lineEdit->text());
+    SendToServer(ui->lineEdit->text(), User.commSendMessageToEveryone);
     ui->lineEdit->clear();
 }
 void MainWindow::slotSendName()
 {
-    QString name="Name:"+User.GetName();
-    SendToServer(name);
+    QString name=User.GetName();
+    SendToServer(name, User.commSendUserName);
 }
 void MainWindow::CloseSocket()
 {
