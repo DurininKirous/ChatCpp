@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QMessageBox>
+#include <QFile>
 #include <client.h>
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,6 +32,7 @@ private:
     Client User;
     QByteArray Data;
     void SendToServer(QString str, quint16 comm);
+    void SendToServerByName(QString str, quint16 comm, QString Name);
     quint16 nextBlockSize=0;
 public slots:
     void  slotReadyRead();
