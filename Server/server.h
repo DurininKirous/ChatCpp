@@ -6,6 +6,8 @@
 #include <QVector>
 #include <QRegularExpression>
 #include <QFile>
+#include <QFileDialog>
+#include <QStandardPaths>
 #include <client.h>
 class Server: public QTcpServer
 {
@@ -28,6 +30,7 @@ public:
     void SendMessageToSpecificClientByName(QString Name, QString str);
     void SendFileToClient(QString FilePath);
     void SendCommandToDisconnect(QString Name);
+    void SendFile(QString FilePath);
     QString GetStrOfUsers();
     bool isNameValid(QString name) const;
     bool isNameUsed(QString name) const;
@@ -49,6 +52,7 @@ signals:
     void SendMessageToMessageBox(QString message);
     void AddUserToGui(QVector<Client*> Users);
     void UserIsDisconnected(QVector<Client*> Users);
+    void PathRequest();
     void NameIsUsed();
     void NameIsntValid();
 };

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>517</width>
     <height>500</height>
    </rect>
   </property>
@@ -15,37 +15,91 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="20" column="0" colspan="6">
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>Send</string>
-      </property>
+    <item row="14" column="5">
+     <widget class="QComboBox" name="comboBox">
+      <item>
+       <property name="text">
+        <string>Chat</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Logs</string>
+       </property>
+      </item>
      </widget>
     </item>
-    <item row="19" column="0" colspan="6">
-     <widget class="QLineEdit" name="lineEdit_2"/>
-    </item>
-    <item row="13" column="1">
-     <widget class="QLineEdit" name="lineEdit"/>
-    </item>
-    <item row="13" column="3">
-     <widget class="QSpinBox" name="spinBox">
-      <property name="maximum">
-       <number>65535</number>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="2">
+    <item row="14" column="2">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Port</string>
       </property>
      </widget>
     </item>
-    <item row="18" column="0" colspan="5">
+    <item row="12" column="0" colspan="7">
+     <widget class="QPushButton" name="pushButton">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Start server</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>25</width>
+        <height>25</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="0" colspan="7">
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>Send File</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="3">
+     <widget class="QSpinBox" name="spinBox">
+      <property name="maximum">
+       <number>65535</number>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="1">
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+    <item row="14" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Address</string>
+      </property>
+     </widget>
+    </item>
+    <item row="20" column="0" colspan="7">
+     <widget class="QLineEdit" name="lineEdit_2"/>
+    </item>
+    <item row="21" column="0" colspan="7">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>Send</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="6">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>Clear Selection</string>
+      </property>
+     </widget>
+    </item>
+    <item row="18" column="0" rowspan="2" colspan="6">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -79,48 +133,8 @@ p, li { white-space: pre-wrap; }
       </widget>
      </widget>
     </item>
-    <item row="13" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Address</string>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="0" colspan="6">
-     <widget class="QPushButton" name="pushButton">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Start server</string>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>25</width>
-        <height>25</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="18" column="5">
+    <item row="18" column="6" rowspan="2">
      <widget class="QListWidget" name="listWidget"/>
-    </item>
-    <item row="13" column="5">
-     <widget class="QComboBox" name="comboBox">
-      <item>
-       <property name="text">
-        <string>Chat</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Logs</string>
-       </property>
-      </item>
-     </widget>
     </item>
    </layout>
   </widget>
@@ -130,7 +144,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>500</width>
+     <width>517</width>
      <height>33</height>
     </rect>
    </property>
