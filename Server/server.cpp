@@ -111,7 +111,14 @@ void Server::slotReadyRead()
                         }
                         break;
                     }
+
                 }
+                break;
+            case 4:
+            {
+                emit PathRequest();
+                break;
+            }
             case 8:
             {
                 QString NameSend;
@@ -255,4 +262,18 @@ QString Server::GetStrOfUsers()
         if (i!=Users.size()-1) str = str + "#";
     }
     return str;
+}
+void Server::SendFile(QString FilePath)
+{
+    Data.clear();
+    QFile file(FilePath);
+    file.open(QIODevice::ReadOnly);
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << User.commSendFileToEveryone << file.readAll();
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    User.socket->write(Data);
+    User.socket->waitForBytesWritten();
+    file.close();
 }

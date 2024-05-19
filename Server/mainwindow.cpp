@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&server, &Server::SendMessageToMessageBox,this,&MainWindow::DisplayErrorMessageBox);
     connect(&server, &Server::AddUserToGui, this, &MainWindow::DisplayUsers);
     connect(&server, &Server::UserIsDisconnected, this, &MainWindow::DisplayUsers);
+    connect(&server,&Server::PathRequest, this, &MainWindow::ChoosePath);
     ui->setupUi(this);
     connect(ui->comboBox,&QComboBox::currentIndexChanged,this,&MainWindow::ChangeScreen);
     ui->stackedWidget->addWidget(ui->textBrowser);
@@ -145,3 +146,33 @@ void MainWindow::DisplayUsers(QVector<Client*> Users)
             ui->listWidget->addItem(Users[i]->GetName());
     }
 }
+void MainWindow::ChoosePath()
+{
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "New file!", "Someone sent you a file, do you want to accept it?", QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+    QString Path = QFileDialog::getSaveFileName(this, "Save file",QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+    QFile file(Path);
+    file.open(QIODevice::WriteOnly);
+    QByteArray data = server.User.socket->readAll();
+    file.write(data);
+    file.close();
+    }
+    else
+    {
+        server.User.socket->readAll();
+    }
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+    if (!Path.isEmpty()) server.SendFile(Path);
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    ui->listWidget->clearSelection();
+}
+

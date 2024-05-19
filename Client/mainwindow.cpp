@@ -94,7 +94,8 @@ void MainWindow::slotReadyRead()
             }
             case 4:
             {
-
+                SaveFile();
+                break;
             }
             case 5:
             {
@@ -158,6 +159,20 @@ void MainWindow::SendToServerByName(QString str, quint16 comm, QString Name)
     out << quint16(Data.size() - sizeof(quint16));
     User.socket -> write(Data);
 }
+void MainWindow::SendFile(QString FilePath)
+{
+    Data.clear();
+    QFile file(FilePath);
+    file.open(QIODevice::ReadOnly);
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << User.commSendFileToEveryone << file.readAll();
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    User.socket->write(Data);
+    User.socket->waitForBytesWritten();
+    file.close();
+}
 void MainWindow::on_pushButton_clicked()
 {
     if (ui->listWidget->selectedItems().size()==0)
@@ -199,3 +214,32 @@ void MainWindow::CloseSocket()
     //if (ui->listWidget->count() != 0) ui->listWidget->clear();
     User.socket->deleteLater();
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+    if (!Path.isEmpty()) SendFile(Path);
+}
+void MainWindow::SaveFile()
+{
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "New file!", "Someone sent you a file, do you want to accept it?", QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+    QString Path = QFileDialog::getSaveFileName(this, "Save file",QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+    QFile file(Path);
+    file.open(QIODevice::WriteOnly);
+    QByteArray data = User.socket->readAll();
+    file.write(data);
+    file.close();
+    }
+    else
+    {
+        User.socket->readAll();
+    }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    ui->listWidget->clearSelection();
+}
+
