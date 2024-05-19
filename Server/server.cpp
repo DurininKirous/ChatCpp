@@ -17,7 +17,7 @@ void Server::StopServer()
 {
     for (int i=0;i<Users.size();++i)
     {
-        Users[i]->socket->disconnectFromHost();
+        SendCommandToDisconnect((*Users[i]).GetName());
         //Users[i]->socket->deleteLater();
         //Users[i]->socket->close();
     }
@@ -38,7 +38,6 @@ void Server::incomingConnection(qintptr socketDescriptor)
     Users.push_back(newUser);
     QString message = "System: Client connected " + QString::number(socketDescriptor);
     emit SendGoodMessageToLogs(message);
-    qDebug() <<Users.size();
 }
 void Server::slotReadyRead()
 {
@@ -72,11 +71,11 @@ void Server::slotReadyRead()
             QString name;
             quint16 comm;
             in >> comm;
-            in >> str;
             nextBlockSize=0;
             switch (comm)
             {
             case 1:
+                in >> str;
                 for (auto it = Users.begin(); it != Users.end(); ++it)
                 {
                     if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
@@ -89,24 +88,53 @@ void Server::slotReadyRead()
                 SendMessageToClient(str, this->commSendMessageToEveryone);
                 break;
             case 2:
+                in >> str;
                 for (auto it = Users.begin(); it != Users.end(); ++it)
                 {
                     if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
                     {
                         if (!(this->isNameValid(str)))
                         {
-                            SendMessageToSpecificClient((*it),"System: The name isn't valid. Please change it, you're disconnected");
+                            SendErrorMessageToSpecificClient((*it),"System: The name isn't valid. Please change it, you're disconnected");
                             //break;
                         }
                         else if (!(this->isNameUsed(str)))
                         {
-                            SendMessageToSpecificClient((*it),"System: The name is already used. Please change it, you're disconnected");
+                            SendErrorMessageToSpecificClient((*it),"System: The name is already taken (the Server name is always taken for the server). Please change it, you're disconnected");
                             //break;
                         }
-                        else (*it)->SetName(str);
+                        else
+                        {
+                            (*it)->SetName(str);
+                            emit AddUserToGui(Users);
+                            SendMessageToClient(GetStrOfUsers(),5);
+                        }
                         break;
                     }
                 }
+            case 8:
+            {
+                QString NameSend;
+                in >> NameSend;
+                QString str;
+                in >> str;
+                for (auto it = Users.begin(); it != Users.end(); ++it)
+                {
+                    if ((*it)->socket == qobject_cast<QTcpSocket*>(sender()))
+                    {
+                        name=(*it)->GetName();
+                    }
+                }
+                for (auto it = Users.begin(); it != Users.end(); ++it)
+                {
+                    if ((*it)->GetName() == NameSend)
+                    {
+                        str=name+": "+str;
+                        SendMessageToSpecificClientByName(NameSend, str);
+                        break;
+                    }
+                }
+            }
             }
             break;
         }
@@ -122,13 +150,18 @@ void Server::slotDeleteUser()
     for (auto it = Users.begin(); it != Users.end(); ++it)
     {
         if ((*it)->socket == disconnectedSocket)
-        {
+        {      
             emit SendBadMessageToLogs("System: Client disconnected");
             (*it)->socket->deleteLater();
             delete (*it);
             Users.erase(it);
+            emit UserIsDisconnected(Users);
             break;
         }
+    }
+    for (auto it = Users.begin(); it != Users.end(); ++it)
+    {
+        SendMessageToClient(GetStrOfUsers(),5);
     }
 }
 void Server::SendMessageToClient(QString str, quint16 comm)
@@ -145,12 +178,12 @@ void Server::SendMessageToClient(QString str, quint16 comm)
         (*Users[i]).socket->write(Data);
     }
 }
-void Server::SendMessageToSpecificClient(Client* user, QString str)
+void Server::SendErrorMessageToSpecificClient(Client* user, QString str)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << commSendMessageToSpecificClient << str;
+    out << quint16(0) << commSendErrorMessageToSpecificClient << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     //socket -> write(Data);
@@ -163,16 +196,40 @@ void Server::SendMessageToSpecificClient(Client* user, QString str)
         }
     }
 }
-void Server::SendFileToClient(QString FilePath)
+void Server::SendMessageToSpecificClientByName(QString Name, QString str)
 {
-    QFile file(FilePath);
-    if (file.open(QIODevice::ReadOnly))
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << commSendMessageToSpecificClient << str;
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    //socket -> write(Data);
+    for(int i=0;i<Users.size();++i)
     {
-        QDataStream out(&Data, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_6_2);
-        out << quint16(0) << file.readAll();
-        out.device()->seek(0);
-        out << quint16(Data.size() - sizeof(quint16));
+        if (Name == (*Users[i]).GetName())
+        {
+            (*Users[i]).socket->write(Data);
+            break;
+        }
+    }
+}
+void Server::SendCommandToDisconnect(QString Name)
+{
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << commDisconnect;
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    //socket -> write(Data);
+    for(int i=0;i<Users.size();++i)
+    {
+        if (Name == (*Users[i]).GetName())
+        {
+            (*Users[i]).socket->write(Data);
+            break;
+        }
     }
 }
 bool Server::isNameValid(QString name) const
@@ -183,9 +240,19 @@ bool Server::isNameValid(QString name) const
 
 bool Server::isNameUsed(QString name) const
 {
+    if (name == "Server") return false;
     for (int i = 0; i < Users.length(); ++i)
         if (Users.at(i)->GetName() == name)
             return false;
     return true;
 }
-
+QString Server::GetStrOfUsers()
+{
+    QString str;
+    for (int i=0; i < Users.size(); ++i)
+    {
+        str=str + Users[i]->GetName();
+        if (i!=Users.size()-1) str = str + "#";
+    }
+    return str;
+}

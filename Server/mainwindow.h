@@ -27,6 +27,7 @@ private slots:
     void DisplayGoodLog(QString message);
     void DisplayBadLog(QString message);
     void DisplayErrorMessageBox(QString message);
+    void DisplayUsers(QVector<Client*> Users);
     //void on_comboBox_activated(const QString &arg1);
 
     void on_pushButton_2_clicked();

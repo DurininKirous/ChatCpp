@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&server,&Server::SendGoodMessageToLogs,this,&MainWindow::DisplayGoodLog);
     connect(&server,&Server::SendBadMessageToLogs,this,&MainWindow::DisplayBadLog);
     connect(&server, &Server::SendMessageToMessageBox,this,&MainWindow::DisplayErrorMessageBox);
+    connect(&server, &Server::AddUserToGui, this, &MainWindow::DisplayUsers);
+    connect(&server, &Server::UserIsDisconnected, this, &MainWindow::DisplayUsers);
     ui->setupUi(this);
     connect(ui->comboBox,&QComboBox::currentIndexChanged,this,&MainWindow::ChangeScreen);
     ui->stackedWidget->addWidget(ui->textBrowser);
@@ -78,10 +80,18 @@ void MainWindow::ChangeScreen()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    server.SendMessageToClient(ui->lineEdit_2->text(),server.commSendMessageToEveryone);
+    if (ui->listWidget->selectedItems().size()==0)
+        server.SendMessageToClient("Server: " + ui->lineEdit_2->text(),server.commSendMessageToEveryone);
+    else
+    {
+        for (auto Names: ui->listWidget->selectedItems())
+        {
+            server.SendMessageToSpecificClientByName(Names->text(),"Server: *(private)* " + ui->lineEdit_2->text());
+        }
+    }
     if (server.isListening())
     {
-        ui->textBrowser->append(ui->lineEdit_2->text());
+        ui->textBrowser->append("Server: *(private)* " + ui->lineEdit_2->text());
     }
     else
     {
@@ -94,10 +104,21 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_lineEdit_2_returnPressed()
 {
-    server.SendMessageToClient(ui->lineEdit_2->text(), server.commSendMessageToEveryone);
+    if (ui->listWidget->selectedItems().size()==0)
+        server.SendMessageToClient("Server: " + ui->lineEdit_2->text(),server.commSendMessageToEveryone);
+    else
+    {
+        for (auto Names: ui->listWidget->selectedItems())
+        {
+            server.SendMessageToSpecificClientByName(Names->text(),"Server: *(private)* " + ui->lineEdit_2->text());
+        }
+    }
     if (server.isListening())
     {
-        ui->textBrowser->append(ui->lineEdit_2->text());
+        if (ui->listWidget->selectedItems().size()==0)
+            ui->textBrowser->append("Server: " + ui->lineEdit_2->text());
+        else
+            ui->textBrowser->append("Server: *(private)* " + ui->lineEdit_2->text());
     }
     else
     {
@@ -110,4 +131,17 @@ void MainWindow::on_lineEdit_2_returnPressed()
 void MainWindow::DisplayErrorMessageBox(QString str)
 {
     QMessageBox::information(this, "Error", str);
+}
+
+//void MainWindow::on_pushButton_3_clicked()
+//{
+ //   server.SendFileToClient("/home/durininkirous/file");
+//}
+void MainWindow::DisplayUsers(QVector<Client*> Users)
+{
+    ui->listWidget->clear();
+    for (int i=0; i < Users.size(); ++i)
+    {
+            ui->listWidget->addItem(Users[i]->GetName());
+    }
 }
