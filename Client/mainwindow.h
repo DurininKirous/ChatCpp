@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <client.h>
+#include <QThread>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -24,7 +25,9 @@ public:
     void SendToServer(QString str, quint16 comm);
     void SendToServerByName(QString str, quint16 comm, QString Name);
     void SendFile(QString FilePath);
+    void SendFileToSpecificClient(QString FilePath, QString Name);
     void SaveFile();
+    void DisplayErrorMessageBox(QString str);
 private slots:
     void on_pushButton_2_clicked();
 

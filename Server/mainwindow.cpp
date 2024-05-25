@@ -97,7 +97,8 @@ void MainWindow::on_pushButton_2_clicked()
     else
     {
         ui->textBrowser_2->setTextColor(QColor(Qt::red));
-        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent");
+        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent.");
+        DisplayErrorMessageBox("The server has not started yet, the message has not been sent.");
         ui->textBrowser_2->setTextColor(QColor(Qt::black));
     }
     ui->lineEdit_2->clear();
@@ -124,20 +125,17 @@ void MainWindow::on_lineEdit_2_returnPressed()
     else
     {
         ui->textBrowser_2->setTextColor(QColor(Qt::red));
-        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent");
+        ui->textBrowser_2->append("System: The server has not started yet, the message has not been sent.");
+        DisplayErrorMessageBox("The server has not started yet, the message has not been sent.");
         ui->textBrowser_2->setTextColor(QColor(Qt::black));
     }
     ui->lineEdit_2->clear();
 }
 void MainWindow::DisplayErrorMessageBox(QString str)
 {
-    QMessageBox::information(this, "Error", str);
+    QMessageBox::information(this, "Error!", str);
 }
 
-//void MainWindow::on_pushButton_3_clicked()
-//{
- //   server.SendFileToClient("/home/durininkirous/file");
-//}
 void MainWindow::DisplayUsers(QVector<Client*> Users)
 {
     ui->listWidget->clear();
@@ -146,6 +144,7 @@ void MainWindow::DisplayUsers(QVector<Client*> Users)
             ui->listWidget->addItem(Users[i]->GetName());
     }
 }
+
 void MainWindow::ChoosePath()
 {
     QMessageBox::StandardButton reply = QMessageBox::question(this, "New file!", "Someone sent you a file, do you want to accept it?", QMessageBox::Yes | QMessageBox::No);
@@ -160,14 +159,34 @@ void MainWindow::ChoosePath()
     }
     else
     {
-        server.User.socket->readAll();
+        while (server.User.socket->bytesAvailable() > 0)
+        {
+            server.User.socket->readAll();
+        }
     }
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-    if (!Path.isEmpty()) server.SendFile(Path);
+    if (server.isListening())
+    {
+        QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+        if (!Path.isEmpty())
+        {
+            if (ui->listWidget->selectedItems().size()==0) server.SendFile(Path);
+            else
+            {
+                for (auto Names: ui->listWidget->selectedItems())
+                {
+                    server.SendFileToSpecificClient(Path,Names->text());
+                }
+            }
+        }
+    }
+    else
+    {
+        DisplayErrorMessageBox("The client is not connected and the file cannot be sent.");
+    }
 }
 
 

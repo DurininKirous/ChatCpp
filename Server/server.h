@@ -21,6 +21,7 @@ public:
     static const quint16 commSendMessageToSpecificClient=6;
     static const quint16 commDisconnect=7;
     static const quint16 commGetMessageToSelectedUsersFromClient=8;
+    static const quint16 commSendFileToSpecificClient=9;
 public:
     Server();
     void StartServer(QHostAddress Addr, quint16 Port);
@@ -31,6 +32,7 @@ public:
     void SendFileToClient(QString FilePath);
     void SendCommandToDisconnect(QString Name);
     void SendFile(QString FilePath);
+    void SendFileToSpecificClient(QString FilePath, QString Name);
     QString GetStrOfUsers();
     bool isNameValid(QString name) const;
     bool isNameUsed(QString name) const;

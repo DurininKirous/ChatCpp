@@ -142,6 +142,15 @@ void Server::slotReadyRead()
                     }
                 }
             }
+            case 9:
+                QString Name;
+                in >> Name;
+                QFile file("ServerTmpFile");
+                file.open(QIODevice::WriteOnly);
+                QByteArray data = User.socket->readAll();
+                file.write(data);
+                file.close();
+                SendFileToSpecificClient("ServerTmpFile",Name);
             }
             break;
         }
@@ -273,7 +282,31 @@ void Server::SendFile(QString FilePath)
     out << quint16(0) << User.commSendFileToEveryone << file.readAll();
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
-    User.socket->write(Data);
-    User.socket->waitForBytesWritten();
+    for(int i=0;i<Users.size();++i)
+    {
+        (*Users[i]).socket->write(Data);
+        User.socket->waitForBytesWritten();
+    }
+    file.close();
+}
+void Server::SendFileToSpecificClient(QString FilePath, QString Name)
+{
+    Data.clear();
+    QFile file(FilePath);
+    file.open(QIODevice::ReadOnly);
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << User.commSendFileToSpecificClient << file.readAll();
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    for(int i=0;i<Users.size();++i)
+    {
+        if (Name == (*Users[i]).GetName())
+        {
+            (*Users[i]).socket->write(Data);
+            User.socket->waitForBytesWritten();
+            break;
+        }
+    }
     file.close();
 }
