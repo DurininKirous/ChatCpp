@@ -6,67 +6,65 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>755</width>
     <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(154, 153, 150);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="lineEdit_2"/>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Port</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Address</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="5">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="7">
-     <widget class="QLineEdit" name="lineEdit_3"/>
-    </item>
-    <item row="2" column="3">
-     <widget class="QSpinBox" name="spinBox">
-      <property name="maximum">
-       <number>65535</number>
+    <item row="5" column="0" colspan="9">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
       </property>
      </widget>
     </item>
     <item row="2" column="8">
      <widget class="QPushButton" name="pushButton_4">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
        <string>Clear Selection</string>
       </property>
      </widget>
     </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_2">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Port</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0" colspan="9">
      <widget class="QPushButton" name="pushButton_2">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
        <string>Connect</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="9">
-     <widget class="QPushButton" name="pushButton_3">
+    <item row="2" column="5">
+     <widget class="QLabel" name="label_3">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
-       <string>Send File</string>
+       <string>Name</string>
       </property>
      </widget>
     </item>
@@ -74,6 +72,69 @@
      <widget class="QListWidget" name="listWidget">
       <property name="enabled">
        <bool>true</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="9">
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Send File</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QSpinBox" name="spinBox">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="maximum">
+       <number>65535</number>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Address</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0" colspan="9">
+     <widget class="QPushButton" name="pushButton">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Send</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="6">
+     <widget class="QLineEdit" name="lineEdit_3">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
       </property>
      </widget>
     </item>
@@ -85,15 +146,9 @@
         <height>0</height>
        </size>
       </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="9">
-     <widget class="QLineEdit" name="lineEdit"/>
-    </item>
-    <item row="6" column="0" colspan="9">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Send</string>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
       </property>
      </widget>
     </item>
@@ -104,7 +159,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>755</width>
      <height>33</height>
     </rect>
    </property>

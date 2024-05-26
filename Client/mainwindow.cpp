@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(User.socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
     connect(User.socket, SIGNAL(disconnected()), this, SLOT(CloseSocket()));
     connect(User.socket, SIGNAL(connected()), this, SLOT(slotSendName()));
+    ui->lineEdit_2->setText("127.0.0.1");
+    ui->spinBox->setValue(2468);
+    ui->lineEdit_3->setText("MyName");
 }
 
 MainWindow::~MainWindow()
@@ -123,6 +126,11 @@ void MainWindow::slotReadyRead()
                 ui->pushButton_2->setText("Connect");
                 if (ui->listWidget->count() != 0) ui->listWidget->clear();
                 User.Check=false;
+            case 9:
+            {
+                SaveFile();
+                break;
+            }
             default:
                 break;
             }
@@ -173,35 +181,63 @@ void MainWindow::SendFile(QString FilePath)
     User.socket->waitForBytesWritten();
     file.close();
 }
+void MainWindow::SendFileToSpecificClient(QString FilePath, QString Name)
+{
+    Data.clear();
+    QFile file(FilePath);
+    file.open(QIODevice::ReadOnly);
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << quint16(0) << User.commSendFileToSpecificClient << Name << file.readAll();
+    out.device()->seek(0);
+    out << quint16(Data.size() - sizeof(quint16));
+    User.socket->write(Data);
+    User.socket->waitForBytesWritten();
+    file.close();
+}
 void MainWindow::on_pushButton_clicked()
 {
-    if (ui->listWidget->selectedItems().size()==0)
-        SendToServer(ui->lineEdit->text(),User.commSendMessageToEveryone);
+    if (User.socket->state() == QAbstractSocket::ConnectedState)
+    {
+        if (ui->listWidget->selectedItems().size()==0)
+            SendToServer(ui->lineEdit->text(),User.commSendMessageToEveryone);
+        else
+        {
+            for (auto Names: ui->listWidget->selectedItems())
+            {
+                SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
+            }
+            ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+        }
+    }
     else
     {
-        for (auto Names: ui->listWidget->selectedItems())
-        {
-            SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
-        }
-        ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+        DisplayErrorMessageBox("The client is not connected, the message was not sent.");
     }
-    ui->lineEdit->clear();
+        ui->lineEdit->clear();
 }
 
 
 void MainWindow::on_lineEdit_returnPressed()
 {
-    if (ui->listWidget->selectedItems().size()==0)
-        SendToServer(ui->lineEdit->text(),User.commSendMessageToEveryone);
+    if (User.socket->state() == QAbstractSocket::ConnectedState)
+    {
+        if (ui->listWidget->selectedItems().size()==0)
+            SendToServer(ui->lineEdit->text(),User.commSendMessageToEveryone);
+        else
+        {
+            for (auto Names: ui->listWidget->selectedItems())
+            {
+                SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
+            }
+            ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+        }
+    }
     else
     {
-        for (auto Names: ui->listWidget->selectedItems())
-        {
-            SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
-        }
-        ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+        DisplayErrorMessageBox("The client is not connected, the message was not sent.");
     }
-    ui->lineEdit->clear();
+        ui->lineEdit->clear();
 }
 void MainWindow::slotSendName()
 {
@@ -217,8 +253,25 @@ void MainWindow::CloseSocket()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-    if (!Path.isEmpty()) SendFile(Path);
+    if (User.socket->state() == QAbstractSocket::ConnectedState)
+    {
+        QString Path = QFileDialog::getOpenFileName(this, "Select a file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+        if (!Path.isEmpty())
+        {
+            if (ui->listWidget->selectedItems().size()==0) SendFile(Path);
+            else
+            {
+                for (auto Names: ui->listWidget->selectedItems())
+                {
+                    SendFileToSpecificClient(Path,Names->text());
+                }
+            }
+        }
+    }
+    else
+    {
+        DisplayErrorMessageBox("The client is not connected and the file cannot be sent.");
+    }
 }
 void MainWindow::SaveFile()
 {
@@ -234,7 +287,10 @@ void MainWindow::SaveFile()
     }
     else
     {
-        User.socket->readAll();
+        while (User.socket->bytesAvailable() > 0)
+        {
+            User.socket->readAll();
+        }
     }
 }
 
@@ -242,4 +298,7 @@ void MainWindow::on_pushButton_4_clicked()
 {
     ui->listWidget->clearSelection();
 }
-
+void MainWindow::DisplayErrorMessageBox(QString str)
+{
+    QMessageBox::information(this, "Error!", str);
+}

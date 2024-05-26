@@ -15,6 +15,7 @@ public:
     static const quint16 commSendMessageToSpecificClient=6;
     static const quint16 commDisconnect=7;
     static const quint16 commSendMessageToSelectedUsersFromClient=8;
+    static const quint16 commSendFileToSpecificClient=9;
 public:
     QTcpSocket* socket;
     bool Check=false;

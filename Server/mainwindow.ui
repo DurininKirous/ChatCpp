@@ -6,33 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
+    <width>681</width>
     <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(154, 153, 150);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="14" column="5">
-     <widget class="QComboBox" name="comboBox">
-      <item>
-       <property name="text">
-        <string>Chat</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Logs</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="14" column="2">
-     <widget class="QLabel" name="label">
+    <item row="21" column="0" colspan="7">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
-       <string>Port</string>
+       <string>Send</string>
       </property>
      </widget>
     </item>
@@ -43,6 +39,10 @@
         <width>0</width>
         <height>0</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
       </property>
       <property name="text">
        <string>Start server</string>
@@ -55,56 +55,65 @@
       </property>
      </widget>
     </item>
+    <item row="14" column="3">
+     <widget class="QSpinBox" name="spinBox">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="maximum">
+       <number>65535</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
     <item row="13" column="0" colspan="7">
      <widget class="QPushButton" name="pushButton_3">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
        <string>Send File</string>
       </property>
      </widget>
     </item>
-    <item row="14" column="3">
-     <widget class="QSpinBox" name="spinBox">
-      <property name="maximum">
-       <number>65535</number>
-      </property>
-     </widget>
-    </item>
     <item row="14" column="1">
-     <widget class="QLineEdit" name="lineEdit"/>
-    </item>
-    <item row="14" column="0">
-     <widget class="QLabel" name="label_2">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
       <property name="text">
-       <string>Address</string>
+       <string/>
       </property>
      </widget>
     </item>
-    <item row="20" column="0" colspan="7">
-     <widget class="QLineEdit" name="lineEdit_2"/>
-    </item>
-    <item row="21" column="0" colspan="7">
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>Send</string>
+    <item row="14" column="2">
+     <widget class="QLabel" name="label">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
       </property>
-     </widget>
-    </item>
-    <item row="14" column="6">
-     <widget class="QPushButton" name="pushButton_4">
       <property name="text">
-       <string>Clear Selection</string>
+       <string>Port</string>
       </property>
      </widget>
     </item>
     <item row="18" column="0" rowspan="2" colspan="6">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="1" column="0">
          <widget class="QTextBrowser" name="textBrowser">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
+          </property>
           <property name="html">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -120,6 +129,10 @@ p, li { white-space: pre-wrap; }
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <widget class="QTextBrowser" name="textBrowser_2">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+          </property>
           <property name="html">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -133,8 +146,63 @@ p, li { white-space: pre-wrap; }
       </widget>
      </widget>
     </item>
+    <item row="14" column="5">
+     <widget class="QComboBox" name="comboBox">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Chat</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Logs</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="14" column="6">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(192, 191, 188);
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Clear Selection</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Address</string>
+      </property>
+     </widget>
+    </item>
     <item row="18" column="6" rowspan="2">
-     <widget class="QListWidget" name="listWidget"/>
+     <widget class="QListWidget" name="listWidget">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+    </item>
+    <item row="20" column="0" colspan="7">
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 221, 218);
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -144,7 +212,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>517</width>
+     <width>681</width>
      <height>33</height>
     </rect>
    </property>
