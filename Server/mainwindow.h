@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QMenu>
+#include <QSystemTrayIcon>
 #include <server.h>
 
 QT_BEGIN_NAMESPACE
@@ -19,6 +21,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     Server server;
+    QSystemTrayIcon trayIcon;
 public slots:
     void ChangeScreen();
     void ChoosePath();
@@ -29,7 +32,8 @@ private slots:
     void DisplayBadLog(QString message);
     void DisplayErrorMessageBox(QString message);
     void DisplayUsers(QVector<Client*> Users);
-    //void on_comboBox_activated(const QString &arg1);
+    void ShowNotification(QString Heading, QString Body);
+    void ShowApp();
 
     void on_pushButton_2_clicked();
 
@@ -39,6 +43,7 @@ private slots:
     void on_pushButton_4_clicked();
 
 private:
+    //QSystemTrayIcon* m_trayIcon;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

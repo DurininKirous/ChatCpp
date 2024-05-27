@@ -19,16 +19,14 @@ public:
 public:
     QTcpSocket* socket;
     bool Check=false;
+public:
     Client();
     ~Client();
-    Client(const Client&) {}
-    Client& operator=(const Client&) { return *this; }
     void SetName(QString name);
     QString GetName();
 public slots:
     void NameIsUsed();
     void NameIsntValid();
-    //void ReadFile();
 signals:
     void BoxNameIsUsed();
     void BoxNameIsntValid();

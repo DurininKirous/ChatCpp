@@ -4,6 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , trayIcon(new QSystemTrayIcon(this))
 {
     ui->setupUi(this);
     User.socket = new QTcpSocket(this);
@@ -13,6 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEdit_2->setText("127.0.0.1");
     ui->spinBox->setValue(2468);
     ui->lineEdit_3->setText("MyName");
+    trayIcon.show();
+    QMenu trayMenu;
+    QAction *messageAction = trayMenu.addAction("New message");
+    trayIcon.setContextMenu(&trayMenu);
+    QObject::connect(&trayIcon, &QSystemTrayIcon::messageClicked, this, &MainWindow::ShowApp);
 }
 
 MainWindow::~MainWindow()
@@ -34,6 +40,9 @@ void MainWindow::on_pushButton_2_clicked()
         {
             User.Check = true;
             ui->pushButton_2->setText("Disconnect");
+            ui->textBrowser->setTextColor(QColor(Qt::green));
+            ui->textBrowser->append("System: You're connected!");
+            ui->textBrowser->setTextColor(QColor(Qt::black));
         }
         else
         {
@@ -54,9 +63,6 @@ void MainWindow::slotReadyRead()
     in.setVersion(QDataStream::Qt_6_2);
     if (in.status() == QDataStream::Ok)
     {
-        /*QString str;
-        in >> str;
-        */
         for (;;)
         {
             if (nextBlockSize==0)
@@ -82,6 +88,7 @@ void MainWindow::slotReadyRead()
                     in >> str;
                     nextBlockSize=0;
                     ui->textBrowser->append(str);
+                    ShowNotification("New message!", "You have a new message!");
                     break;
                 }
             case 3:
@@ -97,8 +104,20 @@ void MainWindow::slotReadyRead()
             }
             case 4:
             {
-                SaveFile();
-                break;
+                if (User.socket->state() == QAbstractSocket::ConnectedState)
+                    {
+                        SaveFile();
+                    }
+                    else
+                    {
+                        // игнорировать получение файла
+                        while (User.socket->bytesAvailable() > 0)
+                        {
+                            User.socket->readAll();
+                            nextBlockSize=0;
+                        }
+                    }
+                    break;
             }
             case 5:
             {
@@ -119,16 +138,17 @@ void MainWindow::slotReadyRead()
                 in >> str;
                 nextBlockSize=0;
                 ui->textBrowser->append(str);
+                ShowNotification("New message!", "You have a new message!");
                 break;
             }
             case 7:
                 User.socket->disconnectFromHost();
-                ui->pushButton_2->setText("Connect");
-                if (ui->listWidget->count() != 0) ui->listWidget->clear();
-                User.Check=false;
+                nextBlockSize=0;
+                break;
             case 9:
             {
                 SaveFile();
+                nextBlockSize=0;
                 break;
             }
             default:
@@ -142,11 +162,7 @@ void MainWindow::slotReadyRead()
         ui->textBrowser->append("read error...");
     }
 }
-/*void MainWindow::slotDeleteUser()
-{
-    Sockets.erase(std::remove_if(Socket.begin(), Socket.end(), socket), Socket.end());
-    Socket->deleteLater();
-}*/
+
 void MainWindow::SendToServer(QString str, quint16 comm)
 {
     Data.clear();
@@ -247,8 +263,13 @@ void MainWindow::slotSendName()
 void MainWindow::CloseSocket()
 {
     while (User.socket->state() != QAbstractSocket::UnconnectedState)
-    //if (ui->listWidget->count() != 0) ui->listWidget->clear();
     User.socket->deleteLater();
+    ui->pushButton_2->setText("Connect");
+    if (ui->listWidget->count() != 0) ui->listWidget->clear();
+    User.Check=false;
+    ui->textBrowser->setTextColor(QColor(Qt::red));
+    ui->textBrowser->append("System: You're disconnected!");
+    ui->textBrowser->setTextColor(QColor(Qt::black));
 }
 
 void MainWindow::on_pushButton_3_clicked()
@@ -298,7 +319,19 @@ void MainWindow::on_pushButton_4_clicked()
 {
     ui->listWidget->clearSelection();
 }
+
 void MainWindow::DisplayErrorMessageBox(QString str)
 {
     QMessageBox::information(this, "Error!", str);
+}
+
+void MainWindow::ShowApp()
+{
+    this->setWindowState(Qt::WindowActive);
+    this->activateWindow();
+}
+
+void MainWindow::ShowNotification(QString Heading, QString Body)
+{
+    if (this->isMinimized()) trayIcon.showMessage(Heading, Body, QSystemTrayIcon::Information, 10000);
 }

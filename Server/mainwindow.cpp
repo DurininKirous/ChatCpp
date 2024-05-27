@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , trayIcon(new QSystemTrayIcon(this))
     , ui(new Ui::MainWindow)
 {
     connect(&server,&Server::SendMessageToChat,this,&MainWindow::DisplayMessage);
@@ -13,11 +14,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&server,&Server::PathRequest, this, &MainWindow::ChoosePath);
     ui->setupUi(this);
     connect(ui->comboBox,&QComboBox::currentIndexChanged,this,&MainWindow::ChangeScreen);
+    connect(&server,&Server::ShowNotification,this,&MainWindow::ShowNotification);
+
     ui->stackedWidget->addWidget(ui->textBrowser);
     ui->stackedWidget->addWidget(ui->textBrowser_2);
     ui->stackedWidget->setCurrentWidget(ui->textBrowser);
     ui->lineEdit->setText("127.0.0.1");
     ui->spinBox->setValue(2468);
+    trayIcon.show();
+    QMenu trayMenu;
+    QAction *messageAction = trayMenu.addAction("New message");
+    trayIcon.setContextMenu(&trayMenu);
+    QObject::connect(&trayIcon, &QSystemTrayIcon::messageClicked, this, &MainWindow::ShowApp);
+
 }
 
 MainWindow::~MainWindow()
@@ -34,6 +43,9 @@ void MainWindow::on_pushButton_clicked()
         bool ok;
         quint16 Port=(ui->spinBox->text()).toInt(&ok);
         server.StartServer(Addr, Port);
+        ui->textBrowser->setTextColor(QColor(Qt::green));
+        ui->textBrowser->append("System: The server started!");
+        ui->textBrowser->setTextColor(QColor(Qt::black));
         if (server.Check == true )
         {
             ui->pushButton->setText("Stop server");
@@ -42,6 +54,9 @@ void MainWindow::on_pushButton_clicked()
     else
     {
         server.StopServer();
+        ui->textBrowser->setTextColor(QColor(Qt::red));
+        ui->textBrowser->append("System: Server is closed...");
+        ui->textBrowser->setTextColor(QColor(Qt::black));
         ui->pushButton->setText("Start server");
     }
 }
@@ -62,11 +77,7 @@ void MainWindow::DisplayBadLog(QString message)
     ui->textBrowser_2->append(message);
     ui->textBrowser_2->setTextColor(QColor(Qt::black));
 }
-/*void MainWindow::on_comboBox_activated(const QString &arg1)
-{
 
-}
-*/
 void MainWindow::ChangeScreen()
 {
     if (ui->comboBox->currentIndex()==0)
@@ -131,6 +142,7 @@ void MainWindow::on_lineEdit_2_returnPressed()
     }
     ui->lineEdit_2->clear();
 }
+
 void MainWindow::DisplayErrorMessageBox(QString str)
 {
     QMessageBox::information(this, "Error!", str);
@@ -185,7 +197,7 @@ void MainWindow::on_pushButton_3_clicked()
     }
     else
     {
-        DisplayErrorMessageBox("The client is not connected and the file cannot be sent.");
+        DisplayErrorMessageBox("The server is no started and the file cannot be sent.");
     }
 }
 
@@ -194,4 +206,12 @@ void MainWindow::on_pushButton_4_clicked()
 {
     ui->listWidget->clearSelection();
 }
-
+void MainWindow::ShowNotification(QString Heading, QString Body)
+{
+    if (this->isMinimized()) trayIcon.showMessage(Heading, Body, QSystemTrayIcon::Information, 10000);
+}
+void MainWindow::ShowApp()
+{
+    this->setWindowState(Qt::WindowActive);
+    this->activateWindow();
+}

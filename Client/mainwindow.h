@@ -8,7 +8,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include <client.h>
-#include <QThread>
+#include <QMenu>
+#include <QSystemTrayIcon>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -44,9 +45,13 @@ private:
     Client User;
     QByteArray Data;
     quint16 nextBlockSize=0;
+public:
+ QSystemTrayIcon trayIcon;
 public slots:
     void  slotReadyRead();
     void  slotSendName();
     void CloseSocket();
+    void ShowApp();
+    void ShowNotification(QString Heading, QString Body);
 };
 #endif // MAINWINDOW_H
