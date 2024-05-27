@@ -43,6 +43,7 @@ private:
     QByteArray Data;
     quint16 nextBlockSize=0;
 
+
 public slots:
     void incomingConnection(qintptr socketDescriptor);
     void slotReadyRead();
@@ -54,6 +55,7 @@ signals:
     void SendMessageToMessageBox(QString message);
     void AddUserToGui(QVector<Client*> Users);
     void UserIsDisconnected(QVector<Client*> Users);
+    void ShowNotification(QString Heading, QString Body);
     void PathRequest();
     void NameIsUsed();
     void NameIsntValid();
