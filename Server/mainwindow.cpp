@@ -103,7 +103,10 @@ void MainWindow::on_pushButton_2_clicked()
     }
     if (server.isListening())
     {
-        ui->textBrowser->append("Server: *(private)* " + ui->lineEdit_2->text());
+        if (ui->listWidget->selectedItems().size()==0)
+            ui->textBrowser->append(QTime::currentTime().toString() + " Server: " + ui->lineEdit_2->text());
+        else
+            ui->textBrowser->append(QTime::currentTime().toString() + " Server: *(private)* " + ui->lineEdit_2->text());
     }
     else
     {
@@ -129,9 +132,9 @@ void MainWindow::on_lineEdit_2_returnPressed()
     if (server.isListening())
     {
         if (ui->listWidget->selectedItems().size()==0)
-            ui->textBrowser->append("Server: " + ui->lineEdit_2->text());
+            ui->textBrowser->append(QTime::currentTime().toString() + " Server: " + ui->lineEdit_2->text());
         else
-            ui->textBrowser->append("Server: *(private)* " + ui->lineEdit_2->text());
+            ui->textBrowser->append(QTime::currentTime().toString() + " Server: *(private)* " + ui->lineEdit_2->text());
     }
     else
     {
@@ -166,6 +169,7 @@ void MainWindow::ChoosePath()
     QFile file(Path);
     file.open(QIODevice::WriteOnly);
     QByteArray data = server.User.socket->readAll();
+    data = QByteArray::fromBase64(data);
     file.write(data);
     file.close();
     }

@@ -24,7 +24,6 @@ public:
     ~Client();
     void SetName(QString name);
     QString GetName();
-public slots:
     void NameIsUsed();
     void NameIsntValid();
 signals:

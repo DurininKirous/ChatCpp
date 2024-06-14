@@ -4,10 +4,12 @@
 #include <QTcpSocket>
 #include <QTcpServer>
 #include <QVector>
+#include <QTime>
 #include <QRegularExpression>
 #include <QFile>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QMimeDatabase>
 #include <client.h>
 class Server: public QTcpServer
 {
@@ -29,7 +31,6 @@ public:
     void SendMessageToClient(QString str, quint16 comm);
     void SendErrorMessageToSpecificClient(Client* user, QString str);
     void SendMessageToSpecificClientByName(QString Name, QString str);
-    void SendFileToClient(QString FilePath);
     void SendCommandToDisconnect(QString Name);
     void SendFile(QString FilePath);
     void SendFileToSpecificClient(QString FilePath, QString Name);

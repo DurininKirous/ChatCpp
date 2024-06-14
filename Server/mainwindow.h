@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QMenu>
+#include <QTime>
 #include <QSystemTrayIcon>
 #include <server.h>
 
@@ -43,7 +44,6 @@ private slots:
     void on_pushButton_4_clicked();
 
 private:
-    //QSystemTrayIcon* m_trayIcon;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

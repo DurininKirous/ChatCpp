@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QTime>
 #include <QFile>
 #include <QFileDialog>
 #include <client.h>
