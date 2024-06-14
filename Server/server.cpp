@@ -1,5 +1,6 @@
 #include "server.h"
-Server::Server() {};
+Server::Server()
+{};
 void Server::StartServer(QHostAddress Addr, quint16 Port)
 {
     if (this->listen(Addr,Port))
@@ -65,6 +66,7 @@ void Server::slotReadyRead()
             QString name;
             quint16 comm;
             in >> comm;
+            QTime time = QTime::currentTime();
             nextBlockSize=0;
             switch (comm)
             {
@@ -77,10 +79,11 @@ void Server::slotReadyRead()
                         name=(*it)->GetName();
                     }
                 }
-                str=name+": "+str;
+                str = name+": " + str;
+                SendMessageToClient(str, this->commSendMessageToEveryone);
+                str=time.toString() +  " " + str;
                 emit SendMessageToChat(str);
                 emit ShowNotification("New message!", "You have a new message!");
-                SendMessageToClient(str, this->commSendMessageToEveryone);
                 break;
             case 2:
                 in >> str;
@@ -136,7 +139,7 @@ void Server::slotReadyRead()
                     }
                     if (NameSend == "Server")
                     {
-                        str=name+": "+str;
+                        str=time.toString() +  " " + name+": " + str;
                         emit SendMessageToChat(str);
                         emit ShowNotification("New message!", "You have a new message!");
                     }
@@ -145,6 +148,11 @@ void Server::slotReadyRead()
             case 9:
                 QString Name;
                 in >> Name;
+                if (Name == "Server")
+                {
+                    emit PathRequest();
+                    break;
+                }
                 QFile file("ServerTmpFile");
                 file.open(QIODevice::WriteOnly);
                 QByteArray data = User.socket->readAll();
@@ -186,7 +194,7 @@ void Server::SendMessageToClient(QString str, quint16 comm)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << comm << str;
+    out << quint16(0) << comm << QTime::currentTime() << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     for(int i=0;i<Users.size();++i)
@@ -199,7 +207,7 @@ void Server::SendErrorMessageToSpecificClient(Client* user, QString str)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << commSendErrorMessageToSpecificClient << str;
+    out << quint16(0) << commSendErrorMessageToSpecificClient << QTime::currentTime() << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     for(int i=0;i<Users.size();++i)
@@ -216,7 +224,7 @@ void Server::SendMessageToSpecificClientByName(QString Name, QString str)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << commSendMessageToSpecificClient << str;
+    out << quint16(0) << commSendMessageToSpecificClient << QTime::currentTime() << str;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     for(int i=0;i<Users.size();++i)
@@ -276,7 +284,8 @@ void Server::SendFile(QString FilePath)
     file.open(QIODevice::ReadOnly);
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << User.commSendFileToEveryone << file.readAll();
+    QByteArray FileBase64 = file.readAll().toBase64();
+    out << quint16(0) << User.commSendFileToEveryone << FileBase64;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     for(int i=0;i<Users.size();++i)
@@ -293,7 +302,8 @@ void Server::SendFileToSpecificClient(QString FilePath, QString Name)
     file.open(QIODevice::ReadOnly);
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << User.commSendFileToSpecificClient << file.readAll();
+    QByteArray FileBase64 = file.readAll().toBase64();
+    out << quint16(0) << User.commSendFileToSpecificClient << FileBase64;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     for(int i=0;i<Users.size();++i)

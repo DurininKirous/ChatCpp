@@ -80,13 +80,16 @@ void MainWindow::slotReadyRead()
             }
             quint16 command;
             in >> command;
+            QTime time;
+            in >> time;
+            nextBlockSize=0;
             switch (command)
             {
                 case (1):
                 {
                     QString str;
                     in >> str;
-                    nextBlockSize=0;
+                    str = time.toString() + " " + str;
                     ui->textBrowser->append(str);
                     ShowNotification("New message!", "You have a new message!");
                     break;
@@ -95,7 +98,6 @@ void MainWindow::slotReadyRead()
             {
                 QString str;
                 in >> str;
-                nextBlockSize=0;
                 QMessageBox::information(this, "Error", str);
                 User.Check=false;
                 ui->pushButton_2->setText("Connect");
@@ -113,8 +115,7 @@ void MainWindow::slotReadyRead()
                         // игнорировать получение файла
                         while (User.socket->bytesAvailable() > 0)
                         {
-                            User.socket->readAll();
-                            nextBlockSize=0;
+                            User.socket->readAll();     
                         }
                     }
                     break;
@@ -136,19 +137,17 @@ void MainWindow::slotReadyRead()
             {
                 QString str;
                 in >> str;
-                nextBlockSize=0;
+                str = time.toString() + " " + str;
                 ui->textBrowser->append(str);
                 ShowNotification("New message!", "You have a new message!");
                 break;
             }
             case 7:
                 User.socket->disconnectFromHost();
-                nextBlockSize=0;
                 break;
             case 9:
             {
                 SaveFile();
-                nextBlockSize=0;
                 break;
             }
             default:
@@ -190,7 +189,8 @@ void MainWindow::SendFile(QString FilePath)
     file.open(QIODevice::ReadOnly);
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << User.commSendFileToEveryone << file.readAll();
+    QByteArray FileBase64 = file.readAll().toBase64();
+    out << quint16(0) << User.commSendFileToEveryone << FileBase64;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     User.socket->write(Data);
@@ -204,7 +204,8 @@ void MainWindow::SendFileToSpecificClient(QString FilePath, QString Name)
     file.open(QIODevice::ReadOnly);
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint16(0) << User.commSendFileToSpecificClient << Name << file.readAll();
+    QByteArray FileBase64 = file.readAll().toBase64();
+    out << quint16(0) << User.commSendFileToSpecificClient << Name << FileBase64;
     out.device()->seek(0);
     out << quint16(Data.size() - sizeof(quint16));
     User.socket->write(Data);
@@ -223,7 +224,7 @@ void MainWindow::on_pushButton_clicked()
             {
                 SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
             }
-            ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+            ui->textBrowser->append(QTime::currentTime().toString() + " " + User.GetName()+": *(private)* " + ui->lineEdit->text());
         }
     }
     else
@@ -246,7 +247,7 @@ void MainWindow::on_lineEdit_returnPressed()
             {
                 SendToServerByName("*(private)* " + ui->lineEdit->text(),User.commSendMessageToSelectedUsersFromClient, Names->text());
             }
-            ui->textBrowser->append(User.GetName()+": *(private)* " + ui->lineEdit->text());
+            ui->textBrowser->append(QTime::currentTime().toString() + " " + User.GetName()+": *(private)* " + ui->lineEdit->text());
         }
     }
     else
@@ -303,6 +304,7 @@ void MainWindow::SaveFile()
     QFile file(Path);
     file.open(QIODevice::WriteOnly);
     QByteArray data = User.socket->readAll();
+    data = QByteArray::fromBase64(data);
     file.write(data);
     file.close();
     }
